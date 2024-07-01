@@ -1,7 +1,9 @@
 <script>
   import Filesystem from '$lib/components/Filesystem.svelte';
   import Graph from '$lib/components/Graph.svelte';
+  import Menu from '$lib/components/Menu.svelte';
   import Settings from '$lib/components/Settings.svelte';
+  import Title from '$lib/components/Title.svelte';
   import Upload from '$lib/components/Upload.svelte';
 </script>
 
@@ -10,8 +12,10 @@
     <Upload />
     <Graph />
   </main>
-  <footer class="justify-center gap-24 grid grid-cols-2 px-24 row-span-3">
+  <footer class="gap-x-24 gap-y-2 grid grid-cols-2 grid-rows-2 justify-center px-24 row-span-3">
     <Filesystem />
     <Settings />
+    <Menu />
+    <Title />
   </footer>
 </div>

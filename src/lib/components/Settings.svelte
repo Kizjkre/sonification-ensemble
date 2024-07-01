@@ -3,7 +3,9 @@
   import selected from '$lib/stores/selected.js';
 </script>
 
-{ #if $selected !== -1 }
+{ #if $selected === -1 }
+  <section></section>
+{ :else }
   <section>
     <div>
       <h2>Graph Settings</h2>

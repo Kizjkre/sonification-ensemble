@@ -3,10 +3,14 @@
   import selected from '$lib/stores/selected.js';
 </script>
 
-<section>
+<section class="border-b border-b-black border-dashed flex flex-col overflow-scroll">
   { #each Object.entries($data) as [id, d], i (i) }
-    <label>
-      <input bind:group={ $selected } type="radio" name="file" value={ +id }>
+    <label
+      class="block cursor-pointer transition"
+      class:file-selected={ $selected === +id }
+      class:text-red-400={ $selected === +id }
+    >
+      <input bind:group={ $selected } class="hidden" name="file" type="radio" value={ +id }>
       { d.name }
     </label>
   { /each }

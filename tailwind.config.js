@@ -7,9 +7,9 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        body: ['"Space Grotesk"', 'sans-serif'],
+        body: ['"Space Mono"', 'sans-serif'],
         display: ['"Neuton"', 'serif'],
-        sans: ['"Space Grotesk"', ...defaultTheme.fontFamily.sans],
+        sans: ['"Space Mono"', ...defaultTheme.fontFamily.sans],
       }
     },
   },

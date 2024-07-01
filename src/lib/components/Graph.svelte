@@ -47,6 +47,7 @@
       .attr('fill', (_, i) => d3.schemeCategory10[color[i]]);
 
     d3.select('rect#seeker')
+      .attr('height', height)
       .attr('width', padding);
   }
 
@@ -94,8 +95,16 @@
         break;
     }
   };
+
+  const handleResize = () => {
+    const rect = svg.parentElement.getBoundingClientRect();
+
+    height = rect.height;
+    width = rect.width;
+  };
 </script>
 
 <svelte:document on:keydown={ handleKeyDown } />
+<svelte:window on:resize={ handleResize } />
 
 <svg bind:this={ svg } class="absolute top-0"></svg>
