@@ -10,7 +10,7 @@
     <Upload />
     <Graph />
   </main>
-  <footer class="row-span-3">
+  <footer class="justify-center gap-24 grid grid-cols-2 px-24 row-span-3">
     <Filesystem />
     <Settings />
   </footer>

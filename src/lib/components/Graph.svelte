@@ -5,10 +5,11 @@
   import { onMount } from 'svelte';
 
   let svg;
-  const height = 400;
-  const width = 600;
+  let height = 400;
+  let width = 600;
 
   let bandwidth = 0;
+  let padding = 0;
   let pos = 0;
 
   $: if ($s in $d) {
@@ -33,12 +34,9 @@
       .padding(ypad);
 
     bandwidth = x.bandwidth() / (1 - xpad);
+    padding = xpad * bandwidth;
 
-    d3.select(svg)
-      .selectAll('g#data')
-      .data([null])
-      .join('g')
-      .attr('id', 'data')
+    d3.select('g#data')
       .selectAll('rect')
       .data(data)
       .join('rect')
@@ -47,9 +45,23 @@
       .attr('width', x.bandwidth())
       .attr('height', y.bandwidth())
       .attr('fill', (_, i) => d3.schemeCategory10[color[i]]);
+
+    d3.select('rect#seeker')
+      .attr('width', padding);
   }
 
   onMount(() => {
+    const rect = svg.parentElement.getBoundingClientRect();
+
+    height = rect.height;
+    width = rect.width;
+
+    d3.select(svg)
+      .selectAll('g#data')
+      .data([null])
+      .join('g')
+      .attr('id', 'data');
+
     d3.select(svg)
       .selectAll('rect#seeker')
       .data([null])
@@ -57,7 +69,7 @@
       .attr('id', 'seeker')
       .attr('x', pos * bandwidth)
       .attr('y', 0)
-      .attr('width', 2)
+      .attr('width', padding)
       .attr('height', height)
       .attr('fill', 'red');
   });
@@ -86,4 +98,4 @@
 
 <svelte:document on:keydown={ handleKeyDown } />
 
-<svg bind:this={ svg }></svg>
+<svg bind:this={ svg } class="absolute top-0"></svg>

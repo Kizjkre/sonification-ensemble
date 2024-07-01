@@ -10,9 +10,10 @@
       selected.set(id);
     } catch {}
     e.target.value = null;
+    e.target.blur();
   };
 </script>
 
-<section>
+<section class="relative z-10">
   <input on:change={ handleUpload } type="file">
 </section>
