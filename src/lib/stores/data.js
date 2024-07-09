@@ -7,6 +7,7 @@ export default {
     const id = new Date().getTime();
 
     // TODO: temp
+    d.index = -1;
     d.y = 0;
     d.color = 1;
     d.shape = -1;

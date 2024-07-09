@@ -12,7 +12,10 @@
   let padding = 0;
   let pos = 0;
 
+  let pi = NaN;
+
   $: if ($s in $d) {
+    const index = $d[$s].data.map(d1 => d1[$d[$s].data.columns[$d[$s].data.index]]);
     const data = $d[$s].data.map(d1 => d1[$d[$s].data.columns[$d[$s].data.y]]);
     const color = $d[$s].data.map(d1 => d1[$d[$s].data.columns[$d[$s].data.color]]);
 
@@ -20,11 +23,13 @@
       .attr('width', width)
       .attr('height', height);
 
-    const xpad = 0.1;
+    const xdomain = $d[$s].data.index !== -1 ? [...new Set(index)] : $d[$s].data.map((_, i) => i);
+
+    const xpad = 0.1 / 50 * xdomain.length;
     const ypad = 0.01;
 
     const x = d3.scaleBand()
-      .domain($d[$s].data.map((_, i) => i))
+      .domain(xdomain)
       .range([0, width])
       .padding(xpad);
 
@@ -40,7 +45,7 @@
       .selectAll('rect')
       .data(data)
       .join('rect')
-      .attr('x', (_, i) => x(i))
+      .attr('x', (_, i) => x($d[$s].data.index === -1 ? i : index[i]))
       .attr('y', d => y(d))
       .attr('width', x.bandwidth())
       .attr('height', y.bandwidth())
@@ -49,6 +54,12 @@
     d3.select('rect#seeker')
       .attr('height', height)
       .attr('width', padding);
+
+    if ($d[$s].data.index !== pi) {
+      d3.select('rect#seeker')
+        .attr('x', pos * bandwidth);
+      pi = $d[$s].data.index;
+    }
   }
 
   onMount(() => {
