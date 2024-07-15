@@ -14,6 +14,7 @@
   };
 </script>
 
-<section class="relative z-10">
-  <input on:change={ handleUpload } type="file">
+<section>
+  <label class="cursor-pointer hover:text-red-400 transition" for="upload">Upload</label>
+  <input class="hidden" id="upload" on:change={ handleUpload } type="file">
 </section>

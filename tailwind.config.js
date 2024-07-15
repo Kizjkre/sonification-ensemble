@@ -10,6 +10,10 @@ export default {
         body: ['"Space Mono"', 'sans-serif'],
         display: ['"Neuton"', 'serif'],
         sans: ['"Space Mono"', ...defaultTheme.fontFamily.sans],
+      },
+      gridTemplateRows: {
+        main: '3fr 1fr',
+        mainFullscreen: '1fr 0fr',
       }
     },
   },

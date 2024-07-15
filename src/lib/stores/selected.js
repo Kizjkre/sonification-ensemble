@@ -1,3 +1,12 @@
 import { writable } from 'svelte/store';
 
-export default writable(-1);
+const { subscribe, set, update } = writable(-1);
+
+export default {
+  subscribe,
+  set: id => {
+    localStorage.setItem('selected', id);
+    return set(id);
+  },
+  update
+};

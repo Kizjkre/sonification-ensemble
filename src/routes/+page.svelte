@@ -4,18 +4,46 @@
   import Menu from '$lib/components/Menu.svelte';
   import Settings from '$lib/components/Settings.svelte';
   import Title from '$lib/components/Title.svelte';
-  import Upload from '$lib/components/Upload.svelte';
+  import data from '$lib/stores/data.js';
+  import selected from '$lib/stores/selected.js';
+  import { onMount } from 'svelte';
+
+  let div;
+  let footer;
+  let hidden = false;
+
+  onMount(() => {
+    localStorage.getItem('hidden') === 'true' && handleHide();
+
+    const stored = localStorage.getItem('data');
+    $data = stored ? JSON.parse(stored) : {};
+
+    $selected = +localStorage.getItem('selected') || -1;
+  });
+
+  const handleHide = () => {
+    footer.classList[hidden ? 'remove' : 'add']('hidden');
+    div.classList[hidden ? 'remove' : 'add']('grid-rows-mainFullscreen');
+    hidden = !hidden;
+
+    localStorage.setItem('hidden', hidden);
+  };
+
+  const handleKeyDown = e => e.key === 'Escape' && handleHide();
 </script>
 
-<div class="grid grid-rows-12 h-full">
-  <main class="row-span-9">
-    <Upload />
+<div bind:this={ div } class="grid grid-rows-main h-full">
+  <main>
     <Graph />
   </main>
-  <footer class="gap-x-24 gap-y-2 grid grid-cols-2 grid-rows-2 justify-center px-24 row-span-3">
-    <Filesystem />
-    <Settings />
-    <Menu />
-    <Title />
+  <footer>
+    <footer bind:this={ footer } class="gap-x-24 gap-y-2 grid grid-cols-2 grid-rows-2 justify-center px-24">
+      <Filesystem />
+      <Settings />
+      <Menu on:hide={ handleHide } />
+      <Title />
+    </footer>
   </footer>
 </div>
+
+<svelte:window on:keydown={ handleKeyDown } />
