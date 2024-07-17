@@ -1,6 +1,7 @@
 <script>
   import Filesystem from '$lib/components/Filesystem.svelte';
   import Graph from '$lib/components/Graph.svelte';
+  import Manual from '$lib/components/Manual.svelte';
   import Menu from '$lib/components/Menu.svelte';
   import Settings from '$lib/components/Settings.svelte';
   import Title from '$lib/components/Title.svelte';
@@ -9,7 +10,6 @@
   import { onMount } from 'svelte';
 
   let div;
-  let footer;
   let hidden = false;
 
   onMount(() => {
@@ -35,9 +35,12 @@
   <main>
     <Graph />
   </main>
-  <footer bind:this={ footer } class="gap-x-24 gap-y-2 grid grid-cols-2 grid-rows-2 justify-center px-24">
+  <footer class="gap-x-24 gap-y-2 grid grid-cols-2 grid-rows-2 justify-center px-24">
     <Filesystem />
-    <Settings />
+    <section class="gap-12 grid grid-cols-2">
+      <Settings />
+      <Manual />
+    </section>
     <Menu on:hide={ handleHide } />
     <Title />
   </footer>
