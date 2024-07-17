@@ -22,7 +22,6 @@
   });
 
   const handleHide = () => {
-    footer.classList[hidden ? 'remove' : 'add']('hidden');
     div.classList[hidden ? 'remove' : 'add']('grid-rows-mainFullscreen');
     hidden = !hidden;
 
@@ -32,17 +31,15 @@
   const handleKeyDown = e => e.key === 'Escape' && handleHide();
 </script>
 
-<div bind:this={ div } class="grid grid-rows-main h-full">
+<div bind:this={ div } class="grid grid-rows-main h-full transition-all">
   <main>
     <Graph />
   </main>
-  <footer>
-    <footer bind:this={ footer } class="gap-x-24 gap-y-2 grid grid-cols-2 grid-rows-2 justify-center px-24">
-      <Filesystem />
-      <Settings />
-      <Menu on:hide={ handleHide } />
-      <Title />
-    </footer>
+  <footer bind:this={ footer } class="gap-x-24 gap-y-2 grid grid-cols-2 grid-rows-2 justify-center px-24">
+    <Filesystem />
+    <Settings />
+    <Menu on:hide={ handleHide } />
+    <Title />
   </footer>
 </div>
 

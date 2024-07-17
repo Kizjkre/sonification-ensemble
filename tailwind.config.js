@@ -12,8 +12,8 @@ export default {
         sans: ['"Space Mono"', ...defaultTheme.fontFamily.sans],
       },
       gridTemplateRows: {
-        main: '3fr 1fr',
-        mainFullscreen: '1fr 0fr',
+        main: '75% auto',
+        mainFullscreen: '100% auto',
       }
     },
   },
