@@ -1,6 +1,7 @@
 <script>
   import d from '$lib/stores/data.js';
   import s from '$lib/stores/selected.js';
+  import measure from '$lib/stores/measure.js';
   import state, { STATE } from '$lib/stores/state.js';
   import * as d3 from 'd3';
   import { onMount } from 'svelte';
@@ -13,7 +14,6 @@
 
   let bandwidth = 0;
   let padding = 0;
-  let pos = 0;
 
   let pi = NaN;
 
@@ -60,7 +60,7 @@
 
     if ($d[$s].index !== pi) {
       d3.select('rect#seeker')
-        .attr('x', pos * bandwidth);
+        .attr('x', $measure * bandwidth);
       pi = $d[$s].index;
     }
   }
@@ -82,7 +82,7 @@
       .data([null])
       .join('rect')
       .attr('id', 'seeker')
-      .attr('x', pos * bandwidth)
+      .attr('x', $measure * bandwidth)
       .attr('y', 0)
       .attr('width', padding)
       .attr('height', height)
@@ -97,18 +97,18 @@
       case ' ':
         d3.select('rect#seeker')
           .transition(10)
-          .attr('x', ++pos * bandwidth);
+          .attr('x', ++$measure * bandwidth);
         break;
       case 'Backspace':
         d3.select('rect#seeker')
           .transition(10)
-          .attr('x', --pos * bandwidth);
+          .attr('x', --$measure * bandwidth);
         break;
       case 'Enter':
         d3.select('rect#seeker')
           .transition(10)
           .attr('x', 0);
-        pos = 0;
+        $measure = 0;
         break;
       case 's':
         $state = !$state;
@@ -131,7 +131,7 @@
     time - t > 1000 && (t = time) &&
       d3.select('rect#seeker')
         .transition(10)
-        .attr('x', ++pos * bandwidth);
+        .attr('x', ++$measure * bandwidth);
     $state === STATE.playing && requestAnimationFrame(start);
     $state === STATE.stopped && (t = -1);
   };

@@ -1,6 +1,7 @@
 <script>
   import Upload from '$lib/components/Upload.svelte';
   import state, { STATE } from '$lib/stores/state.js';
+  import sonify from '$lib/utils/sonify.js';
   import { createEventDispatcher } from 'svelte';
 
   const dispatcher = createEventDispatcher();
@@ -23,5 +24,8 @@
   </button>
   <button class="flex hover:text-red-400 text-left transition" on:dblclick={ handleClear }>
     Clear cache (double click)
+  </button>
+  <button class="flex hover:text-red-400 text-left transition" on:click={ sonify }>
+    Sonify
   </button>
 </section>
