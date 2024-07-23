@@ -8,5 +8,9 @@ export default defineConfig({
   // REF: https://stackoverflow.com/a/72141502
   define: {
     meta: { version: JSON.parse(readFileSync('package.json', 'utf8')).version }
+  },
+  // REF: https://stackoverflow.com/a/75839023
+  build: {
+    target: 'esnext'
   }
 });

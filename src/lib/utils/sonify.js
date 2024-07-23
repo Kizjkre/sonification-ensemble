@@ -21,6 +21,7 @@ export default async () => {
       const colors = d.data.map(d => d[color]).toSorted();
       d.data.forEach((d, i) => {
         const time = ctx.currentTime + (+d[index] || i);
+        console.log(v, time);
         v === d[y] && o.frequency.setValueAtTime(mtof(60 + colors.indexOf(d[color])), time);
         g.gain.setValueAtTime((v === d[y]) / arr.size, time);
       });
