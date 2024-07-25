@@ -1,10 +1,13 @@
 <script>
+  import bpm from '$lib/stores/bpm.js';
   import d from '$lib/stores/data.js';
   import s from '$lib/stores/selected.js';
   import measure from '$lib/stores/measure.js';
   import state, { STATE } from '$lib/stores/state.js';
   import * as d3 from 'd3';
   import { onMount } from 'svelte';
+
+  const TRANSITION_DURATION = 50;
 
   let div;
 
@@ -96,17 +99,20 @@
     switch (e.key) {
       case ' ':
         d3.select('rect#seeker')
-          .transition(10)
+          .transition()
+          .duration(TRANSITION_DURATION)
           .attr('x', ++$measure * bandwidth);
         break;
       case 'Backspace':
         d3.select('rect#seeker')
-          .transition(10)
+          .transition()
+          .duration(TRANSITION_DURATION)
           .attr('x', --$measure * bandwidth);
         break;
       case 'Enter':
         d3.select('rect#seeker')
-          .transition(10)
+          .transition()
+          .duration(TRANSITION_DURATION)
           .attr('x', 0);
         $measure = 0;
         break;
@@ -128,9 +134,10 @@
   let t = -1;
   const start = time => {
     t === -1 && (t = time);
-    time - t > 1000 && (t = time) &&
+    time - t > 1000 * 60 / $bpm - TRANSITION_DURATION && (t = time) &&
       d3.select('rect#seeker')
-        .transition(10)
+        .transition()
+        .duration(TRANSITION_DURATION)
         .attr('x', ++$measure * bandwidth);
     $state === STATE.playing && requestAnimationFrame(start);
     $state === STATE.stopped && (t = -1);

@@ -6,19 +6,24 @@
   import Settings from '$lib/components/Settings.svelte';
   import Title from '$lib/components/Title.svelte';
   import data from '$lib/stores/data.js';
+  import bpm from '$lib/stores/bpm.js';
   import selected from '$lib/stores/selected.js';
   import { onMount } from 'svelte';
 
   let div;
   let hidden = false;
 
-  onMount(() => {
+  onMount(async () => {
+    await import('../lib/utils/audio.js');
+
     localStorage.getItem('hidden') === 'true' && handleHide();
 
     const stored = localStorage.getItem('data');
     $data = stored ? JSON.parse(stored) : {};
 
     $selected = +localStorage.getItem('selected') || -1;
+
+    $bpm = +localStorage.getItem('bpm') || 60;
   });
 
   const handleHide = () => {
@@ -36,11 +41,11 @@
     <Graph />
   </main>
   <footer class="gap-x-24 gap-y-2 grid grid-cols-2 grid-rows-2 justify-center px-24">
-    <Filesystem />
     <section class="gap-12 grid grid-cols-2">
-      <Settings />
+      <Filesystem />
       <Manual />
     </section>
+    <Settings />
     <Menu on:hide={ handleHide } />
     <Title />
   </footer>
