@@ -15,6 +15,6 @@
 </script>
 
 <section>
-  <label class="cursor-pointer hover:text-red-400 transition" for="upload">Upload</label>
-  <input class="hidden" id="upload" on:change={ handleUpload } type="file">
+  <label class="cursor-pointer hover:text-red-400 transition" for="upload">Upload Data</label>
+  <input accept="text/csv" class="hidden" id="upload" on:change={ handleUpload } type="file">
 </section>

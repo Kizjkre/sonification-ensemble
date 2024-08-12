@@ -116,7 +116,7 @@
           .attr('x', 0);
         $measure = 0;
         break;
-      case 's':
+      case 'Shift':
         $state = !$state;
         break;
     }

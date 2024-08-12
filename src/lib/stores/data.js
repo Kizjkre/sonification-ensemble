@@ -15,7 +15,8 @@ export default {
         y: 0,
         color: 1,
         shape: -1,
-        columns: d.columns
+        columns: d.columns,
+        samples: [[]]
       }
     }));
 

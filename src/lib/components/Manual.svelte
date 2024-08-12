@@ -21,7 +21,7 @@
     </p>
     <p class="grid grid-cols-2">
       <span>
-        <kbd class="bg-gray-100 px-1 py-0.5 rounded text-red-400 text-xs">s</kbd>
+        <kbd class="bg-gray-100 px-1 py-0.5 rounded text-red-400 text-xs">shift</kbd>
       </span>
       Start/stop
     </p>
