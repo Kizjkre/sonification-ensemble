@@ -9,6 +9,9 @@
 
   const TRANSITION_DURATION = 50;
 
+  let ctx;
+  onMount(async () => ({ ctx } = await import('$lib/utils/audio.js')));
+
   let div;
 
   let svg;
@@ -132,9 +135,9 @@
   };
 
   let t = -1;
-  const start = time => {
-    t === -1 && (t = time);
-    time - t > 1000 * 60 / $bpm - TRANSITION_DURATION && (t = time) &&
+  const start = () => {
+    t === -1 && (t = ctx.currentTime);
+    ctx.currentTime - t > 60 / $bpm - TRANSITION_DURATION / 1000 && (t += 60 / $bpm) &&
       d3.select('rect#seeker')
         .transition()
         .duration(TRANSITION_DURATION)

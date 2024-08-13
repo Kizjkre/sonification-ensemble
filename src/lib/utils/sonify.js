@@ -38,6 +38,6 @@ export default async () => {
     }
     const source = new AudioBufferSourceNode(ctx, { buffer: buffers[sample] });
     source.connect(ctx.destination);
-    source.start(i * 60 / b);
+    source.start(ctx.currentTime + i * 60 / b);
   }));
 };
