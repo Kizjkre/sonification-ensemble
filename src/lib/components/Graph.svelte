@@ -1,16 +1,22 @@
 <script>
+  import { browser } from '$app/environment';
   import bpm from '$lib/stores/bpm.js';
   import d from '$lib/stores/data.js';
   import s from '$lib/stores/selected.js';
   import measure from '$lib/stores/measure.js';
   import state, { STATE } from '$lib/stores/state.js';
+  import sonify from '$lib/utils/sonify.js';
   import * as d3 from 'd3';
   import { onMount } from 'svelte';
 
   const TRANSITION_DURATION = 50;
 
   let ctx;
-  onMount(async () => ({ ctx } = await import('$lib/utils/audio.js')));
+  let reset;
+  onMount(async () => {
+    ({ ctx } = await import('$lib/utils/audio.js'));
+    ({ reset } = await import('$lib/utils/sonify.js'));
+  });
 
   let div;
 
@@ -120,7 +126,7 @@
         $measure = 0;
         break;
       case 'Shift':
-        $state = !$state;
+        $state === STATE.playing ? reset() : sonify();
         break;
     }
   };
@@ -147,6 +153,11 @@
   };
 
   $: $state === STATE.playing && requestAnimationFrame(start);
+  $: $state === STATE.stopped && (t = -1);
+  $: browser && !$measure && d3.select('rect#seeker')
+    .transition()
+    .duration(TRANSITION_DURATION)
+    .attr('x', 0);
 </script>
 
 <svelte:document on:keydown={ handleKeyDown } />

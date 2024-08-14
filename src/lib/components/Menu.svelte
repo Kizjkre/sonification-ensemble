@@ -13,7 +13,6 @@
     await (await navigator.storage.getDirectory()).remove({ recursive: true });
     window.location.reload();
   };
-  const handleStart = () => $state = !$state;
 </script>
 
 <section class="gap-1 grid grid-cols-2">
@@ -21,14 +20,11 @@
   <button class="flex hover:text-red-400 text-left transition" on:click={ dispatch('hide') }>
     Hide menu (<kbd class="bg-gray-100 px-1 py-0.5 rounded text-red-400">esc</kbd>)
   </button>
-  <button class="flex hover:text-red-400 text-left transition" on:click={ handleStart }>
+  <button class="flex hover:text-red-400 text-left transition" on:click={ sonify }>
     { $state === STATE.playing ? 'Stop' : 'Start' } (<kbd class="bg-gray-100 px-1 py-0.5 rounded text-red-400">shift</kbd>)
   </button>
   <button class="flex hover:text-red-400 text-left transition" on:dblclick={ handleClear }>
     Clear cache (double click)
-  </button>
-  <button class="flex hover:text-red-400 text-left transition" on:click={ sonify }>
-    Sonify
   </button>
   <Samples />
 </section>
