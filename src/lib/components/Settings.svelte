@@ -18,7 +18,7 @@
         <h3 class="font-bold text-sm">Graph Settings</h3>
         <div class="grid grid-cols-2">
           <label for="settings-index">Index</label>
-          <select id="settings-index" bind:value={ $data[$selected].index }>
+          <select bind:value={ $data[$selected].index } id="settings-index" on:keydown|stopPropagation>
             { #each $data[$selected]?.columns || [] as c, i }
               <option value={ i }>{ c }</option>
             { /each }
@@ -26,7 +26,7 @@
           </select>
 
           <label for="settings-y">Y</label>
-          <select id="settings-y" bind:value={ $data[$selected].y }>
+          <select bind:value={ $data[$selected].y } id="settings-y" on:keydown|stopPropagation>
             { #each $data[$selected]?.columns || [] as c, i }
               <option value={ i }>{ c }</option>
             { /each }
@@ -34,7 +34,7 @@
           </select>
 
           <label for="settings-color">Color</label>
-          <select id="settings-color" bind:value={ $data[$selected].color }>
+          <select bind:value={ $data[$selected].color } id="settings-color" on:keydown|stopPropagation>
             { #each $data[$selected]?.columns || [] as c, i }
               <option value={ i }>{ c }</option>
             { /each }
@@ -46,7 +46,7 @@
         <h3 class="font-bold text-sm">Playback Settings</h3>
         <div class="grid grid-cols-2">
           <label for="settings-rate">BPM</label>
-          <input bind:value={ $bpm } class="outline-0" id="settings-rate" min="1" type="number">
+          <input bind:value={ $bpm } class="outline-0" id="settings-rate" min="1" on:keydown|stopPropagation type="number">
           <label class="cursor-pointer hover:text-red-400 transition" for="matrix">
             Upload Sample Matrix
             <input accept="text/csv" class="hidden" id="matrix" on:change={ handleMatrix } type="file">

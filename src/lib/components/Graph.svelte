@@ -2,10 +2,12 @@
   import { browser } from '$app/environment';
   import bpm from '$lib/stores/bpm.js';
   import d from '$lib/stores/data.js';
+  import selected from '$lib/stores/selected.js';
   import s from '$lib/stores/selected.js';
   import measure from '$lib/stores/measure.js';
   import state, { STATE } from '$lib/stores/state.js';
   import sonify from '$lib/utils/sonify.js';
+  import { log } from '@tensorflow/tfjs';
   import * as d3 from 'd3';
   import { onMount } from 'svelte';
 
@@ -105,20 +107,24 @@
   });
 
   const handleKeyDown = e => {
+    if ($selected === -1) return;
     switch (e.key) {
       case ' ':
+        if ($state === STATE.playing) break;
         d3.select('rect#seeker')
           .transition()
           .duration(TRANSITION_DURATION)
           .attr('x', ++$measure * bandwidth);
         break;
       case 'Backspace':
+        if ($state === STATE.playing) break;
         d3.select('rect#seeker')
           .transition()
           .duration(TRANSITION_DURATION)
           .attr('x', --$measure * bandwidth);
         break;
       case 'Enter':
+        if ($state === STATE.playing) break;
         d3.select('rect#seeker')
           .transition()
           .duration(TRANSITION_DURATION)
@@ -126,7 +132,7 @@
         $measure = 0;
         break;
       case 'Shift':
-        $state === STATE.playing ? reset() : sonify();
+        $state === STATE.playing ? reset(false) : sonify(false);
         break;
     }
   };
@@ -160,8 +166,7 @@
     .attr('x', 0);
 </script>
 
-<svelte:document on:keydown={ handleKeyDown } />
-<svelte:window on:resize={ handleResize } />
+<svelte:window on:keydown={ handleKeyDown } on:resize={ handleResize } />
 
 <div bind:this={ div } class="h-full">
   <svg bind:this={ svg } class="absolute top-0"></svg>
