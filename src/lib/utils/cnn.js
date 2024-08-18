@@ -3,46 +3,40 @@ import * as tf from '@tensorflow/tfjs';
 const create = classes => {
   const model = tf.sequential();
 
-  model.add(tf.layers.dense({
-    inputShape: [256],   // Input shape (256 neurons)
-    units: classes,           // Number of output neurons
-    activation: 'softmax' // Activation function (for classification)
+  model.add(tf.layers.conv1d({
+    inputShape: [256, 1],
+    kernelSize: 5,
+    filters: 8,
+    activation: 'relu',
+    kernelInitializer: 'varianceScaling'
   }));
 
-  // model.add(tf.layers.conv1d({
-  //   inputShape: [256, 1],
-  //   kernelSize: 5,
-  //   filters: 8,
-  //   activation: 'relu',
-  //   kernelInitializer: 'varianceScaling'
-  // }));
-  //
-  // model.add(tf.layers.maxPooling1d({
-  //   poolSize: 2,
-  //   strides: 2
-  // }));
-  //
-  // model.add(tf.layers.conv1d({
-  //   kernelSize: 5,
-  //   filters: 16,
-  //   strides: 1,
-  //   activation: 'relu',
-  //   kernelInitializer: 'varianceScaling'
-  // }));
-  //
-  // model.add(tf.layers.maxPooling1d({
-  //   poolSize: 2,
-  //   strides: 2
-  // }));
-  //
-  // model.add(tf.layers.flatten());
-  //
-  // model.add(tf.layers.dense({
-  //   units: classes,
-  //   kernelInitializer: 'varianceScaling',
-  //   activation: 'softmax'
-  // }));
-  //
+  model.add(tf.layers.maxPooling1d({
+    poolSize: 2,
+    strides: 2
+  }));
+
+  model.add(tf.layers.conv1d({
+    kernelSize: 5,
+    filters: 16,
+    strides: 1,
+    activation: 'relu',
+    kernelInitializer: 'varianceScaling'
+  }));
+
+  model.add(tf.layers.maxPooling1d({
+    poolSize: 2,
+    strides: 2
+  }));
+
+  model.add(tf.layers.flatten());
+
+  model.add(tf.layers.dense({
+    units: classes,
+    kernelInitializer: 'varianceScaling',
+    activation: 'softmax'
+  }));
+
   const optimizer = tf.train.adam();
   model.compile({
     optimizer,
@@ -58,8 +52,7 @@ let model = null;
 export const train = (fft, value) => {
   model ??= create(value.length);
   return model.fit(
-    // tf.tensor2d([fft], [1, fft.length]).expandDims(2),
-    tf.tensor2d([fft], [1, fft.length]),
+    tf.tensor2d([fft], [1, fft.length]).expandDims(2),
     tf.tensor2d([value], [1, value.length]),
     {
       epochs: 20,
@@ -70,6 +63,6 @@ export const train = (fft, value) => {
   );
 };
 
-export const predict = fft => model.predict(tf.tensor([fft], [1, fft.length])/*.expandDims(256)*/).dataSync();
+export const predict = fft => model.predict(tf.tensor([fft], [1, fft.length]).expandDims(2)).dataSync();
 
 export const clear = () => model = null;
