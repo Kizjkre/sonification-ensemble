@@ -1,4 +1,7 @@
 import bpm from '$lib/stores/bpm.js';
+import data from '$lib/stores/data.js';
+import measure from '$lib/stores/measure.js';
+import selected from '$lib/stores/selected.js';
 import state, { STATE } from '$lib/stores/state.js';
 import { train } from '$lib/utils/cnn.js';
 import { get } from 'svelte/store';
@@ -19,21 +22,32 @@ export const recorder = new MediaStreamAudioSourceNode(ctx, { mediaStream: strea
 
 recorder.connect(analyser);
 
-const data = new Uint8Array(analyser.frequencyBinCount);
+const freqs = new Uint8Array(analyser.frequencyBinCount);
 export const fft = () => {
-  analyser.getByteFrequencyData(data);
-  return data;
+  analyser.getByteFrequencyData(freqs);
+  return freqs;
 };
 
-export const mtof = m => 440 * 2 ** ((m - 69) / 12);
+measure.subscribe($m => {
+  if (get(state) !== STATE.playing) return;
+  $m--;
 
-let t = -1;
-// const start = time => {
-//   t === -1 && (t = time);
-//   time - t > 1000 * 60 / get(bpm) / 8 && (t = time) && train(fft(), Array(61).fill(0));
-//   get(state) === STATE.playing && requestAnimationFrame(start);
-// };
-// state.subscribe($s => {
-//   ctx.state !== 'running' && ctx.resume();
-//   $s === STATE.playing && requestAnimationFrame(start);
-// });
+  const d = get(data)[get(selected)];
+  const index = d.columns[d.index];
+  const y = d.columns[d.y];
+  const color = d.columns[d.color];
+  const timeline = [];
+  const values = { size: 0 };
+
+  d.data.forEach((r, i) => {
+    i = index ? r[index] : i;
+    !(i in timeline) && (timeline[i] = []);
+    const h = JSON.stringify([r[y], r[color]]);
+    timeline[i].push(h);
+    h in values || (values[h] = values.size++);
+  });
+
+  const output = Array(values.size).fill(0);
+  output[values[timeline[$m]]] = 1;
+  train(fft(), output);
+});
