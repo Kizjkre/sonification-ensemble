@@ -2,7 +2,7 @@ import data from '$lib/stores/data.js';
 import measure from '$lib/stores/measure.js';
 import selected from '$lib/stores/selected.js';
 import state, { STATE } from '$lib/stores/state.js';
-import { clear, predict, train } from '$lib/utils/cnn.js';
+import { clear, train } from '$lib/utils/cnn.js';
 import { get } from 'svelte/store';
 
 export const ctx = new AudioContext();

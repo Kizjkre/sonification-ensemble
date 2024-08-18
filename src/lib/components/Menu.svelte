@@ -16,18 +16,7 @@
     window.location.reload();
   };
 
-  const handleToggle = () => {
-    $state === STATE.playing ? reset(false) : sonify(false);
-    if ($state === STATE.playing) {
-      const testInput = new Uint8Array(256);
-      testInput[2] = 1;
-      try {
-        console.log(predict(testInput));
-      } catch (e) {
-        console.log(e);
-      }
-    }
-  }
+  const handleToggle = () => $state === STATE.playing ? reset(false) : sonify(false);
 </script>
 
 <section class="gap-1 grid grid-cols-2">
