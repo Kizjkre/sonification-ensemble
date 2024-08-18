@@ -3,6 +3,7 @@
   import Upload from '$lib/components/Upload.svelte';
   import selected from '$lib/stores/selected.js';
   import state, { STATE } from '$lib/stores/state.js';
+  import { predict } from '$lib/utils/cnn.js';
   import sonify, { reset } from '$lib/utils/sonify.js';
   import { createEventDispatcher } from 'svelte';
 
@@ -15,7 +16,18 @@
     window.location.reload();
   };
 
-  const handleToggle = () => $state === STATE.playing ? reset(false) : sonify(false);
+  const handleToggle = () => {
+    $state === STATE.playing ? reset(false) : sonify(false);
+    if ($state === STATE.playing) {
+      const testInput = new Uint8Array(256);
+      testInput[3] = 1;
+      try {
+        console.log(predict(testInput));
+      } catch (e) {
+        console.log(e);
+      }
+    }
+  }
 </script>
 
 <section class="gap-1 grid grid-cols-2">
