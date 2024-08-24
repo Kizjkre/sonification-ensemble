@@ -3,7 +3,6 @@
   import Upload from '$lib/components/Upload.svelte';
   import selected from '$lib/stores/selected.js';
   import state, { STATE } from '$lib/stores/state.js';
-  import { predict } from '$lib/utils/cnn.js';
   import sonify, { reset } from '$lib/utils/sonify.js';
   import { createEventDispatcher } from 'svelte';
 

@@ -8,6 +8,7 @@ import { buffers } from '$lib/utils/pad.js';
 import { get } from 'svelte/store';
 
 let sources;
+let gain;
 
 export default async () => {
   state.set(STATE.playing);
@@ -28,8 +29,10 @@ export default async () => {
     timeline[i].push(m[r[y]][r[color]]);
   });
 
-  const { ctx } = await import('$lib/utils/audio.js');
+  const { ctx , recorder } = await import('$lib/utils/audio.js');
   const { list } = await import('$lib/utils/samples.js');
+
+  gain = new GainNode(ctx, { gain: 0.1 });
 
   // noinspection ES6MissingAwait
   sources = timeline.map((slice, i) => slice.map(async sample => {
@@ -42,6 +45,7 @@ export default async () => {
       }
       const source = new AudioBufferSourceNode(ctx, { buffer: buffers[sample] });
       source.connect(ctx.destination);
+      source.connect(gain).connect(recorder);
       source.start(ctx.currentTime + i * 60 / b);
       return source;
     } catch {}
@@ -50,8 +54,15 @@ export default async () => {
 };
 
 export const reset = async () => {
-  const { ctx } = await import('$lib/utils/audio.js');
+  const { ctx, recorder } = await import('$lib/utils/audio.js');
+  const { getWav } = await import('$lib/utils/audio.js');
+  const { default: download } = await import('$lib/utils/download.js');
   state.set(STATE.stopped);
   measure.set(0);
-  sources.forEach(s => s.forEach(async node => (await node)?.disconnect(ctx.destination)));
+  sources?.forEach(s => s.forEach(async node => {
+    (await node)?.disconnect(ctx.destination);
+    (await node)?.disconnect(gain);
+  }));
+  gain?.disconnect(recorder);
+  download(`ensonification-${Date.now()}.wav`, getWav(), 'audio/wav');
 };

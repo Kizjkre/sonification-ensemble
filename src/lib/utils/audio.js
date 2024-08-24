@@ -2,8 +2,10 @@ import data from '$lib/stores/data.js';
 import measure from '$lib/stores/measure.js';
 import selected from '$lib/stores/selected.js';
 import state, { STATE } from '$lib/stores/state.js';
+import { audioBufferToWav } from '$lib/utils/buftowav.js';
 import { clear, train } from '$lib/utils/cnn.js';
 import { get } from 'svelte/store';
+import processor from '$lib/utils/recorder.js?worker&url';
 
 export const ctx = new AudioContext();
 
@@ -17,9 +19,32 @@ const stream = await navigator.mediaDevices.getUserMedia({
   }
 });
 
-export const recorder = new MediaStreamAudioSourceNode(ctx, { mediaStream: stream });
+const microphone = new MediaStreamAudioSourceNode(ctx, { mediaStream: stream });
 
-recorder.connect(analyser).connect(ctx.destination);
+await ctx.audioWorklet.addModule(processor);
+export const recorder = new AudioWorkletNode(ctx, 'recorder');
+const samples = [];
+recorder.port.onmessage = ({ data: { channel, data } }) => {
+  samples[channel] ??= [];
+  samples[channel].push(...data);
+};
+
+export const getWav = () => {
+  const buf = new AudioBuffer({
+    length: samples[0].length,
+    sampleRate: ctx.sampleRate,
+    numberOfChannels: samples.length
+  });
+
+  samples.forEach((channel, i) => buf.copyToChannel(new Float32Array(channel), i));
+
+  return audioBufferToWav(buf, true);
+};
+
+const gain = new GainNode(ctx, { gain: 2 });
+
+microphone.connect(analyser);
+gain.connect(recorder);
 
 const freqs = new Uint8Array(analyser.frequencyBinCount);
 export const fft = () => {
@@ -27,10 +52,19 @@ export const fft = () => {
   return freqs;
 };
 
-measure.subscribe($m => {
+let connected = false;
+measure.subscribe(async $m => {
   if (get(state) !== STATE.playing) {
     clear();
+    connected = false;
+    try {
+      microphone.disconnect(gain);
+    } catch {}
     return;
+  }
+  if (!connected) {
+    microphone.connect(gain);
+    connected = true;
   }
   $m--;
 
@@ -51,9 +85,5 @@ measure.subscribe($m => {
 
   const output = Array(values.size).fill(0);
   output[values[timeline[$m]]] = 1;
-  const testInput = new Uint8Array(analyser.frequencyBinCount);
-  testInput[values[timeline[$m]]] = 1;
-  // train(fft(), output);
-  train(testInput, output);
-  console.log(testInput, output);
+  await train(fft(), output);
 });

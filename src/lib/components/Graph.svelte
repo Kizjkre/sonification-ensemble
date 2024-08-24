@@ -7,7 +7,6 @@
   import measure from '$lib/stores/measure.js';
   import state, { STATE } from '$lib/stores/state.js';
   import sonify from '$lib/utils/sonify.js';
-  import { log } from '@tensorflow/tfjs';
   import * as d3 from 'd3';
   import { onMount } from 'svelte';
 
@@ -31,10 +30,14 @@
 
   let pi = NaN;
 
+  let index;
+  let data;
+  let color;
+
   $: if ($s in $d) {
-    const index = $d[$s].data.map(d1 => d1[$d[$s].columns[$d[$s].index]]);
-    const data = $d[$s].data.map(d1 => d1[$d[$s].columns[$d[$s].y]]);
-    const color = $d[$s].data.map(d1 => d1[$d[$s].columns[$d[$s].color]]);
+    index = $d[$s].data.map(d1 => d1[$d[$s].columns[$d[$s].index]]);
+    data = $d[$s].data.map(d1 => d1[$d[$s].columns[$d[$s].y]]);
+    color = $d[$s].data.map(d1 => d1[$d[$s].columns[$d[$s].color]]);
 
     d3.select(svg)
       .attr('width', width)
@@ -164,6 +167,9 @@
     .transition()
     .duration(TRANSITION_DURATION)
     .attr('x', 0);
+  $: if ($measure === data?.length) {
+
+  }
 </script>
 
 <svelte:window on:keydown={ handleKeyDown } on:resize={ handleResize } />
