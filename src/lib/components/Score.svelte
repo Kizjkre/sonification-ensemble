@@ -1,0 +1,138 @@
+<script>
+  import { data } from '$lib/state/data.svelte.js';
+  import file from '$lib/state/file.svelte.js';
+  import * as d3 from 'd3';
+  import { onMount } from 'svelte';
+  import status from '$lib/state/status.svelte.js';
+
+  let audio;
+  onMount(async () => audio = await import('../util/audio.js'));
+
+  const TRANSITION_DURATION = 50;
+
+  const ypad = 0.01;
+  let div, svg;
+  let height = $state(400), width = $state(600);
+  let measure = $state(0);
+  const x = $derived(data[file.id]?.data.map(d => d[data[file.id].columns[data[file.id].x]]));
+  const y = $derived(data[file.id]?.data.map(d => d[data[file.id].columns[data[file.id].y]]));
+  const color = $derived(data[file.id]?.data.map(d => d[data[file.id].columns[data[file.id].color]]));
+  const colordomain = $derived(d3.extent(color || []));
+  const xdomain = $derived(data[file.id]?.x !== -1 ? [...new Set(x)] : data[file.id]?.data.map((_, i) => i) || []);
+  const xpad = $derived(0.1 / 50 * xdomain.length);
+  const xscale = $derived(
+    d3.scaleBand()
+      .domain(xdomain)
+      .range([0, width])
+      .padding(xpad)
+  );
+  const yscale = $derived(
+    d3.scaleBand()
+      .domain([...new Set(y)].sort())
+      .range([height, 0])
+      .padding(ypad)
+  );
+  const bandwidth = $derived(xscale.bandwidth() / (1 - xpad));
+  const padding = $derived(xpad * bandwidth);
+
+  // noinspection JSVoidFunctionReturnValueUsed
+  onMount(() => {
+    handleResize();
+
+    d3.select(svg)
+      .selectAll('g#data')
+      .data([null])
+      .join('g')
+      .attr('id', 'data');
+
+    d3.select(svg)
+      .selectAll('rect#seeker')
+      .data([null])
+      .join('rect')
+      .attr('id', 'seeker')
+      .attr('x', measure * bandwidth)
+      .attr('y', 0)
+      .attr('width', padding)
+      .attr('height', height)
+      .attr('fill', 'red');
+
+    const observer = new ResizeObserver(handleResize);
+    observer.observe(div);
+  });
+
+  $effect(() =>
+    d3.select('g#data')
+      .selectAll('rect')
+      .data(y || [])
+      .join('rect')
+      .attr('x', (_, i) => xscale(data[file.id]?.x === -1 ? i : x[i]))
+      .attr('y', d => yscale(d))
+      .attr('width', xscale.bandwidth())
+      .attr('height', yscale.bandwidth())
+      .attr('fill', (_, i) => d3.interpolateViridis((color[i] - colordomain[0]) / (colordomain[1] - colordomain[0])))
+  );
+
+  $effect(() =>
+    d3.select('rect#seeker')
+      .attr('height', height)
+      .attr('width', padding)
+      .transition()
+      .duration(TRANSITION_DURATION)
+      .attr('x', measure * bandwidth)
+  );
+
+  const handleKeyDown = e => {
+    if (!file.id) return;
+
+    switch (e.key) {
+      case ' ':
+        if (status.playing) break;
+        measure++;
+        break;
+      case 'Backspace':
+        if (status.playing) break;
+        measure--;
+        break;
+      case 'Enter':
+        if (status.playing) break;
+        measure = 0;
+        break;
+      case 'Shift':
+        status.playing = !status.playing;
+        break;
+    }
+  };
+
+  const handleResize = () => {
+    if (!svg) return;
+
+    const rect = svg.parentElement.getBoundingClientRect();
+
+    height = rect.height;
+    width = rect.width;
+
+    d3.select(svg)
+      .attr('width', width)
+      .attr('height', height);
+  };
+
+  let t = -1;
+  const start = () => {
+    t === -1 && (t = audio.ctx.currentTime);
+    audio.ctx.currentTime - t > 60 / bpm.value - TRANSITION_DURATION / 1000 && (t += 60 / bpm.value) && measure++;
+    status.playing && requestAnimationFrame(start);
+    !status.playing && (t = -1);
+  };
+  $effect(async () => {
+    if (status.playing) {
+      await audio.ctx.resume();
+      requestAnimationFrame(start);
+    } else measure = 0;
+  });
+</script>
+
+<svelte:window onkeydown={handleKeyDown} onresize={handleResize} />
+
+<div bind:this={div} class="h-full">
+  <svg bind:this={svg} class="absolute top-0"></svg>
+</div>

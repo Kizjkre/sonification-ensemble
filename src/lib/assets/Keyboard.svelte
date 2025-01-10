@@ -1,19 +1,19 @@
 <script>
-  import pad from '$lib/stores/pad.js';
+  import samples from '$lib/state/samples.svelte.js';
 
-  const active = {};
+  const active = $state({});
 
   '`1234567890-=qwertyuiop[]asdfghjkl;\'zxcvbnm,./'.split('').forEach(key => active[key] = 0);
 
-  $: $pad.forEach(key => active[key] = 1);
+  $effect(() => Object.entries(samples).forEach(([key, has]) => has && (active[key] = 1)));
 
   const handleKeyDown = e => active[e.key] && (active[e.key] = 0.5);
-  const handleKeyUp = e => $pad.includes(e.key) && (active[e.key] = 1);
+  const handleKeyUp = e => samples[e.key] && (active[e.key] = 1);
 </script>
 
-<svelte:window on:keydown={ handleKeyDown } on:keyup={ handleKeyUp } />
+<svelte:window onkeydown={ handleKeyDown } onkeyup={ handleKeyUp } />
 
-<svg class="h-3/4 transition" viewBox="0.0 0.0 1205.249343832021 402.68766404199476" fill="none" stroke="none"
+<svg class="max-h-full transition" viewBox="0.0 0.0 1205.249343832021 402.68766404199476" fill="none" stroke="none"
      stroke-linecap="square" stroke-miterlimit="10" title="Adapted from Brilliantwiki2, CC0, via Wikimedia Commons; Edited by kizjkre." xmlns="http://www.w3.org/2000/svg"
 >
   <g>
@@ -161,10 +161,10 @@
           fill-rule="evenodd"></path>
     <path stroke="#000000" stroke-width="1.0" stroke-linejoin="round" stroke-linecap="butt"
           d="m939.7008 161.2546l80.25195 0l0 80.25197l-80.25195 0z" fill-rule="evenodd"></path>
-<!--    <path fill="#f87171" fill-opacity={ active[''] } d="m1019.95276 161.2546l80.25195 0l0 80.25197l-80.25195 0z"-->
-<!--          fill-rule="evenodd"></path>-->
-<!--    <path stroke="#000000" stroke-width="1.0" stroke-linejoin="round" stroke-linecap="butt"-->
-<!--          d="m1019.95276 161.2546l80.25195 0l0 80.25197l-80.25195 0z" fill-rule="evenodd"></path>-->
+    <!--    <path fill="#f87171" fill-opacity={ active[''] } d="m1019.95276 161.2546l80.25195 0l0 80.25197l-80.25195 0z"-->
+    <!--          fill-rule="evenodd"></path>-->
+    <!--    <path stroke="#000000" stroke-width="1.0" stroke-linejoin="round" stroke-linecap="butt"-->
+    <!--          d="m1019.95276 161.2546l80.25195 0l0 80.25197l-80.25195 0z" fill-rule="evenodd"></path>-->
     <path fill="#f87171" fill-opacity={ active['z'] } d="m94.35696 241.50656l80.25196 0l0 80.25198l-80.25196 0z"
           fill-rule="evenodd"></path>
     <path stroke="#000000" stroke-width="1.0" stroke-linejoin="round" stroke-linecap="butt"
@@ -205,10 +205,9 @@
           fill-rule="evenodd"></path>
     <path stroke="#000000" stroke-width="1.0" stroke-linejoin="round" stroke-linecap="butt"
           d="m816.6247 241.50656l80.25195 0l0 80.25198l-80.25195 0z" fill-rule="evenodd"></path>
-<!--    <path fill="#f87171" fill-opacity={ active[''] } d="m896.87665 241.50656l80.25195 0l0 80.25198l-80.25195 0z"-->
-<!--          fill-rule="evenodd"></path>-->
-<!--    <path stroke="#000000" stroke-width="1.0" stroke-linejoin="round" stroke-linecap="butt"-->
-<!--          d="m896.87665 241.50656l80.25195 0l0 80.25198l-80.25195 0z" fill-rule="evenodd"></path>-->
+    <!--    <path fill="#f87171" fill-opacity={ active[''] } d="m896.87665 241.50656l80.25195 0l0 80.25198l-80.25195 0z"-->
+    <!--          fill-rule="evenodd"></path>-->
+    <!--    <path stroke="#000000" stroke-width="1.0" stroke-linejoin="round" stroke-linecap="butt"-->
+    <!--          d="m896.87665 241.50656l80.25195 0l0 80.25198l-80.25195 0z" fill-rule="evenodd"></path>-->
   </g>
 </svg>
-

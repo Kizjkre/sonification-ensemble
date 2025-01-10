@@ -1,58 +1,65 @@
 <script>
-  import data from '$lib/stores/data.js';
-  import bpm from '$lib/stores/bpm.js';
-  import selected from '$lib/stores/selected.js';
-  import matrix from '$lib/stores/matrix.js';
-  import { csvParseRows } from 'd3-dsv';
+  import bpm from '$lib/state/bpm.svelte.js';
+  import { data } from '$lib/state/data.svelte.js';
+  import file from '$lib/state/file.svelte.js';
 
-  const handleMatrix = async e => $matrix = csvParseRows(await e.target.files[0].text());
+  const handleBlur = e => e.target.blur();
 </script>
 
-{ #if $selected === -1 }
-  <section></section>
-{ :else }
-  <section>
-    <h2 class="font-bold text-sm">Settings</h2>
-    <div class="gap-8 grid grid-cols-2">
-      <div>
-        <h3 class="font-bold text-sm">Graph Settings</h3>
-        <div class="grid grid-cols-2">
-          <label for="settings-index">Index</label>
-          <select bind:value={ $data[$selected].index } id="settings-index" on:keydown|stopPropagation>
-            { #each $data[$selected]?.columns || [] as c, i }
-              <option value={ i }>{ c }</option>
-            { /each }
-            <option value={ -1 }>None</option>
-          </select>
-
-          <label for="settings-y">Y</label>
-          <select bind:value={ $data[$selected].y } id="settings-y" on:keydown|stopPropagation>
-            { #each $data[$selected]?.columns || [] as c, i }
-              <option value={ i }>{ c }</option>
-            { /each }
-            <option value={ -1 }>None</option>
-          </select>
-
-          <label for="settings-color">Color</label>
-          <select bind:value={ $data[$selected].color } id="settings-color" on:keydown|stopPropagation>
-            { #each $data[$selected]?.columns || [] as c, i }
-              <option value={ i }>{ c }</option>
-            { /each }
-            <option value={ -1 }>None</option>
-          </select>
-        </div>
-      </div>
-      <div>
-        <h3 class="font-bold text-sm">Playback Settings</h3>
-        <div class="grid grid-cols-2">
-          <label for="settings-rate">BPM</label>
-          <input bind:value={ $bpm } class="outline-0" id="settings-rate" min="1" on:keydown|stopPropagation type="number">
-          <label class="cursor-pointer hover:text-red-400 transition" for="matrix">
-            Upload Sample Matrix
-            <input accept="text/csv" class="hidden" id="matrix" on:change={ handleMatrix } type="file">
-          </label>
-        </div>
-      </div>
+<section class="gap-x-2 grid grid-cols-4 grid-rows-3">
+  <div class="col-span-4">
+    <h3 class="font-normal m-0">score settings.</h3>
+  </div>
+  {#if file.id in data}
+  	<div class="flex flex-col row-span-2">
+      <label class="px-2" for="x">x-axis</label>
+      <select bind:value={data[file.id].x} class="border-2 border-gray-100 px-2 rounded" onchange={handleBlur} id="x">
+        {#each data[file.id].columns as column, i (i)}
+          <option value={i}>{column}</option>
+        {/each}
+        <option value={-1}>None</option>
+      </select>
     </div>
-  </section>
-{ /if }
+    <div class="flex flex-col row-span-2">
+      <label class="px-2" for="y">y-axis</label>
+      <select bind:value={data[file.id].y} class="border-2 border-gray-100 px-2 rounded" onchange={handleBlur} id="y">
+        {#each data[file.id].columns as column, i (i)}
+          <option value={i}>{column}</option>
+        {/each}
+        <option value={-1}>None</option>
+      </select>
+    </div>
+    <div class="flex flex-col row-span-2">
+      <label class="px-2" for="color">color</label>
+      <select bind:value={data[file.id].color} class="border-2 border-gray-100 px-2 rounded" onchange={handleBlur} id="color">
+        {#each data[file.id].columns as column, i (i)}
+          <option value={i}>{column}</option>
+        {/each}
+        <option value={-1}>None</option>
+      </select>
+    </div>
+  {:else}
+    <div class="flex flex-col row-span-2">
+      <label class="px-2" for="x">x-axis</label>
+      <select class="border-2 border-gray-100 px-2 rounded" disabled id="x">
+        <option value="0">select a dataset</option>
+      </select>
+    </div>
+    <div class="flex flex-col row-span-2">
+      <label class="px-2" for="y">y-axis</label>
+      <select class="border-2 border-gray-100 px-2 rounded" disabled id="y">
+        <option value="0">select a dataset</option>
+      </select>
+    </div>
+    <div class="flex flex-col row-span-2">
+      <label class="px-2" for="color">color</label>
+      <select class="border-2 border-gray-100 px-2 rounded" disabled id="color">
+        <option value="0">select a dataset</option>
+      </select>
+    </div>
+  {/if}
+  <div class="flex flex-col row-span-2">
+    <label class="px-2" for="bpm">bpm</label>
+    <input bind:value={bpm.value} class="border-2 border-gray-100 px-2 rounded" id="bpm" max="240" min="20" type="number">
+  </div>
+</section>
