@@ -1,3 +1,4 @@
+import file from '$lib/state/file.svelte.js';
 import save from '$lib/util/save.svelte.js';
 
 export const data = $state({});
@@ -14,6 +15,11 @@ export const add = (name, d) => {
     shape: -1
   };
   return id;
+};
+
+export const remove = id => {
+  delete data[id];
+  file.id = null;
 };
 
 save('data', data);

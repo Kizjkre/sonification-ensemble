@@ -5,7 +5,7 @@
   import Settings from '$lib/components/Settings.svelte';
 </script>
 
-<aside class="gap-2 grid grid-cols-12 grid-flow-row-dense grid-rows-2 h-full px-8">
+<aside class="shadow-controls gap-2 grid grid-cols-12 grid-flow-row-dense grid-rows-2 h-full px-8 pt-2 rounded-lg">
   <section class="col-span-3 row-span-2">
     <Menu />
   </section>
