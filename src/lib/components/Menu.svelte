@@ -36,7 +36,7 @@
   const handleMatrix = async e => Object.assign(matrix, csvParseRows(await e.target.files[0].text()));
 
   const handleClear = async () => {
-    await (await samples).clear();
+    await (await samples)?.clear(); // TODO: temp bypass for Firefox
     localStorage.clear();
     location.reload();
   };

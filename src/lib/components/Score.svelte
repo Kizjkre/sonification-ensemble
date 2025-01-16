@@ -1,9 +1,9 @@
 <script>
   import { data } from '$lib/state/data.svelte.js';
   import file from '$lib/state/file.svelte.js';
+  import status from '$lib/state/status.svelte.js';
   import * as d3 from 'd3';
   import { onMount } from 'svelte';
-  import status from '$lib/state/status.svelte.js';
 
   let audio;
   onMount(async () => audio = await import('../util/audio.js'));
@@ -13,7 +13,7 @@
   const ypad = 0.01;
   let div, svg;
   let height = $state(400), width = $state(600);
-  let measure = $state(0);
+  let measure = $state(0), position = $state(0);
   const x = $derived(data[file.id]?.data.map(d => d[data[file.id].columns[data[file.id].x]]));
   const y = $derived(data[file.id]?.data.map(d => d[data[file.id].columns[data[file.id].y]]));
   const color = $derived(data[file.id]?.data.map(d => d[data[file.id].columns[data[file.id].color]]));
@@ -22,7 +22,7 @@
   const xpad = $derived(0.1 / 50 * xdomain.length);
   const xscale = $derived(
     d3.scaleBand()
-      .domain(xdomain)
+      .domain([-Infinity, Math.MIN_SAFE_INTEGER, ...xdomain]) // TODO: maybe jank? if using BigNumber
       .range([0, width])
       .padding(xpad)
   );
@@ -44,6 +44,16 @@
       .data([null])
       .join('g')
       .attr('id', 'data');
+
+    d3.select(svg)
+      .selectAll('rect#seeker-continuous')
+      .data([null])
+      .join('rect')
+      .attr('id', 'seeker-continuous')
+      .attr('x', measure * bandwidth)
+      .attr('y', 0)
+      .attr('width', padding)
+      .attr('height', height);
 
     d3.select(svg)
       .selectAll('rect#seeker')
@@ -80,6 +90,18 @@
       .duration(TRANSITION_DURATION)
       .attr('x', measure * bandwidth)
   );
+
+  $effect(() =>
+    d3.select('rect#seeker-continuous')
+      .attr('height', height)
+      .attr('width', padding)
+      .attr('x', (position + measure) * bandwidth)
+  );
+
+  $effect(() =>
+    d3.select('rect#seeker-continuous')
+      .attr('fill', status.playing ? '#FF000080' : 'transparent')
+  )
 
   const handleKeyDown = e => {
     if (!file.id) return;
@@ -120,14 +142,16 @@
   const start = () => {
     t === -1 && (t = audio.ctx.currentTime);
     audio.ctx.currentTime - t > 60 / bpm.value - TRANSITION_DURATION / 1000 && (t += 60 / bpm.value) && measure++;
+    position = audio.ctx.currentTime - t;
     status.playing && requestAnimationFrame(start);
-    !status.playing && (t = -1);
+    !status.playing && (t = -1) && (measure = (position = 0));
   };
+
   $effect(async () => {
     if (status.playing) {
       await audio.ctx.resume();
       requestAnimationFrame(start);
-    } else measure = 0;
+    }
   });
 </script>
 
