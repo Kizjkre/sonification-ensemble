@@ -22,7 +22,7 @@
   const xpad = $derived(0.1 / 50 * xdomain.length);
   const xscale = $derived(
     d3.scaleBand()
-      .domain([-Infinity, Math.MIN_SAFE_INTEGER, ...xdomain]) // TODO: maybe jank? if using BigNumber
+      .domain([-Infinity, Math.MIN_SAFE_INTEGER, ...xdomain]) // TODO: maybe jank? if using BigInt or strings...
       .range([0, width])
       .padding(xpad)
   );
@@ -142,7 +142,7 @@
   const start = () => {
     t === -1 && (t = audio.ctx.currentTime);
     audio.ctx.currentTime - t > 60 / bpm.value - TRANSITION_DURATION / 1000 && (t += 60 / bpm.value) && measure++;
-    position = audio.ctx.currentTime - t;
+    position = (audio.ctx.currentTime - t) * bpm.value / 60;
     status.playing && requestAnimationFrame(start);
     !status.playing && (t = -1) && (measure = (position = 0));
   };

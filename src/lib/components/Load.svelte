@@ -2,8 +2,8 @@
   import load from '$lib/state/load.svelte.js';
   import { onMount } from 'svelte';
 
-  let splash;
-  let text;
+  let splash = $state();
+  let text = $state();
   let title;
   let covered = $state(true);
   let xtext = $state(0), ytext = $state(0);
