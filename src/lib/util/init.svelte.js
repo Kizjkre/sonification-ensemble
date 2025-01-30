@@ -4,6 +4,7 @@ import file from '$lib/state/file.svelte.js';
 import load from '$lib/state/load.svelte.js';
 import matrix from '$lib/state/matrix.svelte.js';
 import menu from '$lib/state/menu.svelte.js';
+import mode from '$lib/state/mode.svelte.js';
 import samples from '$lib/state/samples.svelte.js';
 import { onMount } from 'svelte';
 
@@ -16,6 +17,7 @@ export default () => onMount(() => {
   Object.assign(samples, get('samples'));
   Object.assign(bpm, get('bpm'));
   Object.assign(matrix, get('matrix'));
+  Object.assign(mode, get('mode'));
 
   load.value = true;
 });

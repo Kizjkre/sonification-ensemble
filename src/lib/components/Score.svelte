@@ -1,6 +1,7 @@
 <script>
   import { data } from '$lib/state/data.svelte.js';
   import file from '$lib/state/file.svelte.js';
+  import mode, { MODE } from '$lib/state/mode.svelte.js';
   import status from '$lib/state/status.svelte.js';
   import * as d3 from 'd3';
   import { onMount } from 'svelte';
@@ -70,17 +71,49 @@
     observer.observe(div);
   });
 
-  $effect(() =>
-    d3.select('g#data')
-      .selectAll('rect')
-      .data(y || [])
-      .join('rect')
-      .attr('x', (_, i) => xscale(data[file.id]?.x === -1 ? i : x[i]))
-      .attr('y', d => yscale(d))
-      .attr('width', xscale.bandwidth())
-      .attr('height', yscale.bandwidth())
-      .attr('fill', (_, i) => d3.interpolateViridis((color[i] - colordomain[0]) / (colordomain[1] - colordomain[0])))
-  );
+  $effect(() => {
+    switch (mode.value) {
+      case MODE.BLOCK:
+        d3.select('g#data')
+          .selectAll('path')
+          .data([])
+          .join('path');
+
+        d3.select('g#data')
+          .selectAll('rect')
+          .data(y || [])
+          .join('rect')
+          .attr('x', (_, i) => xscale(data[file.id]?.x === -1 ? i : x[i]))
+          .attr('y', d => yscale(d))
+          .attr('width', xscale.bandwidth())
+          .attr('height', yscale.bandwidth())
+          .attr('fill', (_, i) => d3.interpolateTurbo((color[i] - colordomain[0]) / (colordomain[1] - colordomain[0])));
+        break;
+      case MODE.LINE:
+        d3.select('g#data')
+          .selectAll('rect')
+          .data([])
+          .join('rect');
+
+        const line = d3.line()
+          .x(([_, i]) => {
+            const scaled = xscale(data[file.id]?.x === -1 ? i : x[i] || x[i - 1]);
+            return isNaN(scaled) ? xscale(i - 1) : scaled;
+          })
+          .y(([d]) => yscale(d) + yscale.bandwidth() / 2);
+
+        d3.select('g#data')
+          .selectAll('path')
+          .data(y?.map((d, i) => i < y.length - 1 ? [[d, i], [y[i + 1], i + 1]] : [[d, i], [d, i + 1]]) || [])
+          .join('path')
+          .attr('d', d => line(d))
+          .attr('fill', 'none')
+          .attr('stroke', (_, i) => d3.interpolateTurbo((color[i] - colordomain[0]) / (colordomain[1] - colordomain[0])))
+          .attr('stroke-width', 15)
+          .attr('stroke-linecap', 'round');
+        break;
+    }
+  });
 
   $effect(() =>
     d3.select('rect#seeker')

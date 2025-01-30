@@ -1,7 +1,7 @@
 {
-  "name": "sonification-ensemble",
+  "name": "ensonification",
   "private": true,
-  "version": "0.1.1-beta (2)",
+  "version": "0.1.2-beta (1)",
   "type": "module",
   "scripts": {
     "dev": "vite dev",
